@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vidoora - Discover & Watch</title>
+<meta name="description" content="Vidoora - Discover and watch videos.">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#0b0b0d;
+    color:#fff;
+    min-height:100vh;
+}
+
+/* HEADER */
+header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:rgba(11,11,13,.96);
+    border-bottom:1px solid #252529;
+    backdrop-filter:blur(10px);
+}
+
+.nav{
+    max-width:1200px;
+    margin:auto;
+    min-height:68px;
+    padding:0 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.logo{
+    font-size:27px;
+    font-weight:800;
+    letter-spacing:-1px;
+}
+
+.logo span{
+    color:#ff1744;
+}
+
+.search-box{
+    flex:1;
+    max-width:430px;
+    position:relative;
+}
+
+.search-box input{
+    width:100%;
+    height:42px;
+    border:1px solid #303035;
+    outline:none;
+    border-radius:22px;
+    background:#17171a;
+    color:white;
+    padding:0 45px 0 18px;
+    font-size:14px;
+}
+
+.search-box input:focus{
+    border-color:#ff1744;
+}
+
+.search-icon{
+    position:absolute;
+    right:16px;
+    top:12px;
+    color:#aaa;
+}
+
+.menu{
+    font-size:25px;
+    cursor:pointer;
+}
+
+/* MENU */
+.menu-panel{
+    display:none;
+    position:absolute;
+    right:16px;
+    top:62px;
+    width:190px;
+    background:#151519;
+    border:1px solid #303035;
+    border-radius:13px;
+    padding:8px;
+    box-shadow:0 15px 40px rgba(0,0,0,.5);
+}
+
+.menu-panel.show{
+    display:block;
+}
+
+.menu-link{
+    display:block;
+    width:100%;
+    padding:12px;
+    color:#ddd;
+    text-decoration:none;
+    border-radius:9px;
+    font-size:14px;
+}
+
+.menu-link:hover{
+    background:#ff1744;
+    color:#fff;
+}
+
+/* ADMIN LINK */
+#adminPanelLink{
+    display:none;
+}
+
+/* AGE SCREEN */
+.age-screen{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:#08080a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+}
+
+.age-card{
+    width:100%;
+    max-width:420px;
+    text-align:center;
+    background:#151519;
+    border:1px solid #303035;
+    border-radius:20px;
+    padding:35px 25px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+
+.age-icon{
+    width:72px;
+    height:72px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#ff1744;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.age-card h1{
+    font-size:28px;
+    margin-bottom:12px;
+}
+
+.age-card p{
+    color:#aaa;
+    line-height:1.6;
+    font-size:14px;
+    margin-bottom:25px;
+}
+
+.age-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.age-buttons button{
+    flex:1;
+    height:46px;
+    border:none;
+    border-radius:24px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.enter{
+    background:#ff1744;
+    color:white;
+}
+
+.leave{
+    background:#29292e;
+    color:#ddd;
+}
+
+/* HERO */
+.hero{
+    max-width:1200px;
+    margin:auto;
+    padding:30px 16px 15px;
+}
+
+.hero h1{
+    font-size:31px;
+    line-height:1.15;
+    margin-bottom:9px;
+}
+
+.hero h1 span{
+    color:#ff1744;
+}
+
+.hero p{
+    color:#999;
+    font-size:14px;
+}
+
+/* CATEGORIES */
+.categories{
+    max-width:1200px;
+    margin:auto;
+    padding:15px 16px 8px;
+    display:flex;
+    gap:9px;
+    overflow-x:auto;
+    scrollbar-width:none;
+}
+
+.categories::-webkit-scrollbar{
+    display:none;
+}
+
+.category{
+    white-space:nowrap;
+    border:1px solid #303035;
+    background:#151519;
+    color:#ccc;
+    padding:9px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.category.active,
+.category:hover{
+    background:#ff1744;
+    border-color:#ff1744;
+    color:white;
+}
+
+/* VIDEO GRID */
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:15px 16px 50px;
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.section-title h2{
+    font-size:20px;
+}
+
+.section-title span{
+    color:#888;
+    font-size:12px;
+}
+
+.video-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+}
+
+.video-card{
+    background:#151519;
+    border:1px solid #242428;
+    border-radius:13px;
+    overflow:hidden;
+    transition:.2s;
+}
+
+.video-card:hover{
+    transform:translateY(-2px);
+    border-color:#3a3a40;
+}
+
+.thumbnail{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/10;
+    background:#222;
+    overflow:hidden;
+}
+
+.thumbnail img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.play{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:rgba(255,23,68,.94);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    padding-left:3px;
+    box-shadow:0 5px 20px rgba(0,0,0,.4);
+}
+
+.duration{
+    position:absolute;
+    right:7px;
+    bottom:7px;
+    background:rgba(0,0,0,.8);
+    padding:4px 6px;
+    border-radius:5px;
+    font-size:10px;
+}
+
+.card-info{
+    padding:11px;
+}
+
+.card-info h3{
+    font-size:14px;
+    line-height:1.35;
+    margin-bottom:7px;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+
+.meta{
+    color:#777;
+    font-size:11px;
+    margin-bottom:10px;
+}
+
+.watch{
+    display:block;
+    width:100%;
+    text-align:center;
+    text-decoration:none;
+    background:#ff1744;
+    color:#fff;
+    border-radius:8px;
+    padding:9px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+/* EMPTY */
+.empty{
+    display:none;
+    text-align:center;
+    padding:50px 20px;
+    color:#777;
+}
+
+/* FOOTER */
+footer{
+    border-top:1px solid #252529;
+    text-align:center;
+    padding:25px 15px;
+    color:#666;
+    font-size:12px;
+}
+
+@media(min-width:700px){
+    .video-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .hero{
+        padding-top:45px;
+    }
+}
+
+@media(min-width:1000px){
+    .video-grid{
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AGE WARNING -->
+<div class="age-screen" id="ageScreen">
+    <div class="age-card">
+
+        <div class="age-icon">18+</div>
+
+        <h1>Welcome to Vidoora</h1>
+
+        <p>
+            This website is intended for adults only.
+            You must be 18 years or older to enter.
+            Please continue only if you are legally permitted
+            to access adult content in your location.
+        </p>
+
+        <div class="age-buttons">
+
+            <button class="enter" onclick="enterSite()">
+                I am 18+
+            </button>
+
+            <button class="leave" onclick="leaveSite()">
+                Leave
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- HEADER -->
+<header>
+
+    <div class="nav">
+
+        <div class="logo">
+            Vid<span>o</span>ora
+        </div>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search videos..."
+                oninput="searchVideos()"
+            >
+
+            <div class="search-icon">
+                ⌕
+            </div>
+
+        </div>
+
+        <div
+            class="menu"
+            onclick="toggleMenu()"
+        >
+            ☰
+        </div>
+
+    </div>
+
+
+    <!-- USER MENU -->
+    <div
+        class="menu-panel"
+        id="menuPanel"
+    >
+
+        <a
+            href="login.html"
+            class="menu-link"
+        >
+            🔐 Login
+        </a>
+
+        <a
+            href="signup.html"
+            class="menu-link"
+        >
+            👤 Sign Up
+        </a>
+
+        <!-- ADMIN ONLY -->
+        <a
+            href="add-video.html"
+            class="menu-link"
+            id="adminPanelLink"
+        >
+            🔐 Admin Panel
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- HERO -->
+<section class="hero">
+
+    <h1>
+        Discover <span>Videos</span>
+    </h1>
+
+    <p>
+        Browse the latest videos and choose what you want to watch.
+    </p>
+
+</section>
+
+
+<!-- CATEGORIES -->
+<div class="categories">
+
+    <button
+        class="category active"
+        onclick="filterCategory('All',this)"
+    >
+        All
+    </button>
+
+    <button
+        class="category"
+        onclick="filterCategory('Popular',this)"
+    >
+        🔥 Popular
+    </button>
+
+    <button
+        class="category"
+        onclick="filterCategory('New',this)"
+    >
+        🆕 New
+    </button>
+
+    <button
+        class="category"
+        onclick="filterCategory('Trending',this)"
+    >
+        📈 Trending
+    </button>
+
+</div>
+
+
+<!-- VIDEOS -->
+<main class="container">
+
+    <div class="section-title">
+
+        <h2>
+            Latest Videos
+        </h2>
+
+        <span id="videoCount">
+            0 videos
+        </span>
+
+    </div>
+
+
+    <div
+        class="video-grid"
+        id="videoGrid"
+    >
+
+    </div>
+
+
+    <div
+        class="empty"
+        id="empty"
+    >
+        No videos found.
+    </div>
+
+</main>
+
+
+<footer>
+    © 2026 Vidoora. All rights reserved.
+</footer>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+    "https://lfsjnghkgzsghhcexgsu.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_xkvVadBo9ApuaE81iWdAsQ_Q8F5Efvv";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =========================
+   MENU
+========================= */
+
+function toggleMenu(){
+
+    const panel =
+        document.getElementById(
+            "menuPanel"
+        );
+
+    panel.classList.toggle(
+        "show"
+    );
+
+}
+
+
+/* =========================
+   CHECK ADMIN
+========================= */
+
+async function checkAdmin(){
+
+    const adminLink =
+        document.getElementById(
+            "adminPanelLink"
+        );
+
+    if(!adminLink){
+        return;
+    }
+
+    adminLink.style.display =
+        "none";
+
+    try{
+
+        const {
+            data: {
+                session
+            }
+        } =
+            await supabaseClient.auth.getSession();
+
+        if(!session){
+
+            return;
+
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.rpc(
+                "is_admin"
+            );
+
+
+        if(error){
+
+            console.error(
+                "Admin check error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        if(data === true){
+
+            adminLink.style.display =
+                "block";
+
+        }
+
+    }
+    catch(error){
+
+        console.error(
+            "Admin verification error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* Check admin when page loads */
+
+checkAdmin();
+
+
+/* Update menu after login/logout */
+
+supabaseClient.auth.onAuthStateChange(
+    function(){
+
+        checkAdmin();
+
+    }
+);
+
+
+/* Close menu when clicking elsewhere */
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        const panel =
+            document.getElementById(
+                "menuPanel"
+            );
+
+        const menu =
+            document.querySelector(
+                ".menu"
+            );
+
+        if(
+            !panel.contains(event.target) &&
+            !menu.contains(event.target)
+        ){
+
+            panel.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================
+   AGE VERIFICATION
+========================= */
+
+function enterSite(){
+
+    localStorage.setItem(
+        "vidooraAgeVerified",
+        "yes"
+    );
+
+    document.getElementById(
+        "ageScreen"
+    ).style.display = "none";
+
+}
+
+
+function leaveSite(){
+
+    window.location.href =
+        "https://www.google.com";
+
+}
+
+
+if(
+    localStorage.getItem(
+        "vidooraAgeVerified"
+    ) === "yes"
+){
+
+    document.getElementById(
+        "ageScreen"
+    ).style.display = "none";
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(value){
+
+    return String(value || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+   SUPABASE VIDEOS
+========================= */
+
+async function loadSupabaseVideos(){
+
+    try{
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("videos")
+            .select("*")
+            .order(
+                "created_at",
+                {
+                    ascending:false
+                }
+            );
+
+        if(error){
+
+            console.error(
+                "Supabase error:",
+                error
+            );
+
+            applyCurrentFilters();
+
+            return;
+
+        }
+
+        if(
+            !data ||
+            data.length === 0
+        ){
+
+            applyCurrentFilters();
+
+            return;
+
+        }
+
+
+        const grid =
+            document.getElementById(
+                "videoGrid"
+            );
+
+
+        data.forEach(
+            function(video){
+
+                const card =
+                    document.createElement(
+                        "article"
+                    );
+
+                card.className =
+                    "video-card supabase-video";
+
+                card.dataset.category =
+                    normalizeCategory(
+                        video.category
+                    );
+
+                card.dataset.title =
+                    video.title || "";
+
+
+                card.innerHTML = `
+
+                    <div class="thumbnail">
+
+                        <img
+                            src="${escapeHTML(video.image)}"
+                            alt="${escapeHTML(video.title)}"
+                            onerror="this.style.display='none'"
+                        >
+
+                        <div class="play">
+                            ▶
+                        </div>
+
+                        <div class="duration">
+                            ${escapeHTML(
+                                video.duration ||
+                                "00:00"
+                            )}
+                        </div>
+
+                    </div>
+
+                    <div class="card-info">
+
+                        <h3>
+                            ${escapeHTML(
+                                video.title
+                            )}
+                        </h3>
+
+                        <div class="meta">
+                            ${escapeHTML(
+                                normalizeCategory(
+                                    video.category
+                                )
+                            )}
+                            •
+                            ${escapeHTML(
+                                video.views ||
+                                "0"
+                            )}
+                            views
+                        </div>
+
+                        <a
+                            class="watch"
+                            href="${escapeHTML(
+                                video.video
+                            )}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ▶ Watch Video
+                        </a>
+
+                    </div>
+
+                `;
+
+                grid.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+        applyCurrentFilters();
+
+    }
+    catch(error){
+
+        console.error(
+            "Video loading error:",
+            error
+        );
+
+        applyCurrentFilters();
+
+    }
+
+}
+
+
+/* =========================
+   CATEGORY NORMALIZER
+========================= */
+
+function normalizeCategory(
+    category
+){
+
+    const value =
+        String(category || "")
+            .toLowerCase();
+
+    if(
+        value === "popular"
+    ){
+
+        return "Popular";
+
+    }
+
+    if(
+        value === "new"
+    ){
+
+        return "New";
+
+    }
+
+    if(
+        value === "trending"
+    ){
+
+        return "Trending";
+
+    }
+
+    return "New";
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function searchVideos(){
+
+    applyCurrentFilters();
+
+}
+
+
+/* =========================
+   CURRENT CATEGORY
+========================= */
+
+let currentCategory =
+    "All";
+
+
+/* =========================
+   CATEGORY FILTER
+========================= */
+
+function filterCategory(
+    category,
+    button
+){
+
+    currentCategory =
+        category;
+
+    document
+        .querySelectorAll(
+            ".category"
+        )
+        .forEach(
+            function(btn){
+
+                btn.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+    button.classList.add(
+        "active"
+    );
+
+    applyCurrentFilters();
+
+}
+
+
+/* =========================
+   SEARCH + CATEGORY
+========================= */
+
+function applyCurrentFilters(){
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const cards =
+        document.querySelectorAll(
+            ".video-card"
+        );
+
+
+    let count = 0;
+
+
+    cards.forEach(
+        function(card){
+
+            const title =
+                (
+                    card.dataset.title ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            const category =
+                normalizeCategory(
+                    card.dataset.category
+                );
+
+
+            const categoryMatch =
+                currentCategory === "All" ||
+                category === currentCategory;
+
+
+            const searchMatch =
+                title.includes(
+                    search
+                );
+
+
+            if(
+                categoryMatch &&
+                searchMatch
+            ){
+
+                card.style.display =
+                    "";
+
+                count++;
+
+            }
+            else{
+
+                card.style.display =
+                    "none";
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "videoCount"
+    ).textContent =
+        count +
+        (
+            count === 1
+                ? " video"
+                : " videos"
+        );
+
+
+    document.getElementById(
+        "empty"
+    ).style.display =
+        count === 0
+            ? "block"
+            : "none";
+
+}
+
+
+/* =========================
+   LOAD
+========================= */
+
+loadSupabaseVideos();
+
+</script>
+
+</body>
+</html>
