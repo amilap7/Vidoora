@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Vidoora - Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif
+}
+
+body{
+background:#0b0b0d;
+color:#fff;
+min-height:100vh
+}
+
+.container{
+max-width:520px;
+margin:auto;
+padding:25px 16px 50px
+}
+
+.logo{
+font-size:30px;
+font-weight:800;
+margin-bottom:8px
+}
+
+.logo span{
+color:#ff1744
+}
+
+.subtitle{
+color:#888;
+margin-bottom:25px
+}
+
+.box{
+background:#151519;
+border:1px solid #29292f;
+border-radius:15px;
+padding:20px
+}
+
+h1{
+font-size:24px;
+margin-bottom:20px
+}
+
+label{
+display:block;
+font-size:13px;
+color:#aaa;
+margin:15px 0 7px
+}
+
+input,
+select{
+width:100%;
+background:#202026;
+border:1px solid #35353d;
+border-radius:8px;
+padding:13px;
+color:#fff;
+outline:none
+}
+
+input:focus,
+select:focus{
+border-color:#ff1744
+}
+
+button{
+width:100%;
+border:0;
+border-radius:8px;
+padding:13px;
+margin-top:18px;
+font-weight:bold;
+cursor:pointer
+}
+
+.login-btn,
+.submit-btn{
+background:#ff1744;
+color:#fff
+}
+
+.logout-btn{
+background:#29292f;
+color:#fff
+}
+
+.message{
+display:none;
+margin-top:15px;
+padding:12px;
+border-radius:8px;
+font-size:13px;
+line-height:1.5
+}
+
+.preview{
+display:none;
+margin-top:12px;
+border-radius:8px;
+overflow:hidden;
+background:#202026
+}
+
+.preview img{
+width:100%;
+display:block;
+max-height:280px;
+object-fit:cover
+}
+
+#adminPanel{
+display:none
+}
+
+#loginPanel{
+display:block
+}
+
+.user-info{
+background:#202026;
+padding:12px;
+border-radius:8px;
+font-size:13px;
+color:#aaa;
+margin-bottom:10px;
+word-break:break-word
+}
+
+.back{
+display:inline-block;
+color:#aaa;
+text-decoration:none;
+margin-bottom:20px;
+font-size:14px
+}
+
+.back:hover{
+color:#fff
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<a href="index.html" class="back">
+← Back to Vidoora
+</a>
+
+<div class="logo">
+Vid<span>o</span>ora
+</div>
+
+<div class="subtitle">
+Admin video management
+</div>
+
+
+<!-- LOGIN -->
+
+<div class="box" id="loginPanel">
+
+<h1>Admin Login</h1>
+
+<label>Email</label>
+
+<input
+type="email"
+id="email"
+placeholder="Admin email"
+autocomplete="email">
+
+<label>Password</label>
+
+<input
+type="password"
+id="password"
+placeholder="Password"
+autocomplete="current-password">
+
+<button
+class="login-btn"
+onclick="loginAdmin()">
+Login
+</button>
+
+<div
+class="message"
+id="loginMessage">
+</div>
+
+</div>
+
+
+<!-- ADMIN PANEL -->
+
+<div class="box" id="adminPanel">
+
+<h1>Add Video</h1>
+
+<div class="user-info" id="adminUser">
+Checking admin...
+</div>
+
+<label>Video Title</label>
+
+<input
+type="text"
+id="title"
+placeholder="Enter video title">
+
+<label>Thumbnail Image URL</label>
+
+<input
+type="url"
+id="image"
+placeholder="https://example.com/image.jpg"
+oninput="previewImage()">
+
+<div class="preview" id="preview">
+<img id="previewImg" alt="Thumbnail preview">
+</div>
+
+<label>Video URL</label>
+
+<input
+type="url"
+id="video"
+placeholder="https://example.com/video">
+
+<label>Category</label>
+
+<select id="category">
+
+<option value="New">
+New
+</option>
+
+<option value="Popular">
+Popular
+</option>
+
+<option value="Trending">
+Trending
+</option>
+
+</select>
+
+<label>Duration</label>
+
+<input
+type="text"
+id="duration"
+placeholder="10:25">
+
+<label>Views</label>
+
+<input
+type="text"
+id="views"
+placeholder="0">
+
+<button
+class="submit-btn"
+onclick="addVideo()">
+Add Video
+</button>
+
+<div
+class="message"
+id="submitMessage">
+</div>
+
+<button
+class="logout-btn"
+onclick="logoutAdmin()">
+Sign Out
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ==================================
+   SUPABASE CONFIG
+================================== */
+
+const SUPABASE_URL =
+"https://lfsjnghkgzsghhcexgsu.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_xkvVadBo9ApuaE81iWdAsQ_Q8F5Efvv";
+
+
+const supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+/* ==================================
+   MESSAGE
+================================== */
+
+function showMessage(
+elementId,
+message,
+success=false
+){
+
+const box=
+document.getElementById(elementId);
+
+box.style.display="block";
+
+box.textContent=message;
+
+if(success){
+box.style.background="#17351f";
+box.style.color="#7dff9a";
+}else{
+box.style.background="#35171d";
+box.style.color="#ff8d9e";
+}
+
+}
+
+
+/* ==================================
+   LOGIN
+================================== */
+
+async function loginAdmin(){
+
+const email=
+document.getElementById("email")
+.value
+.trim();
+
+const password=
+document.getElementById("password")
+.value;
+
+
+if(!email || !password){
+
+showMessage(
+"loginMessage",
+"Please enter email and password."
+);
+
+return;
+}
+
+
+const {
+data,
+error
+}=
+await supabaseClient.auth.signInWithPassword({
+
+email:email,
+password:password
+
+});
+
+
+if(error){
+
+showMessage(
+"loginMessage",
+error.message
+);
+
+return;
+}
+
+
+await checkAdmin(data.user);
+
+}
+
+
+/* ==================================
+   CHECK ADMIN
+================================== */
+
+async function checkAdmin(user=null){
+
+if(!user){
+
+const result=
+await supabaseClient.auth.getUser();
+
+user=result.data.user;
+
+}
+
+
+if(!user){
+
+showLogin();
+
+return;
+
+}
+
+
+const {
+data,
+error
+}=
+await supabaseClient
+.from("admin_users")
+.select("user_id")
+.eq("user_id",user.id)
+.maybeSingle();
+
+
+if(error){
+
+console.error(error);
+
+await supabaseClient.auth.signOut();
+
+showLogin();
+
+showMessage(
+"loginMessage",
+"Unable to verify admin account."
+);
+
+return;
+
+}
+
+
+if(!data){
+
+await supabaseClient.auth.signOut();
+
+showLogin();
+
+showMessage(
+"loginMessage",
+"This account is not an admin."
+);
+
+return;
+
+}
+
+
+document
+.getElementById("loginPanel")
+.style.display="none";
+
+document
+.getElementById("adminPanel")
+.style.display="block";
+
+document
+.getElementById("adminUser")
+textContent=
+"Logged in as: "+user.email;
+
+}
+
+
+/* ==================================
+   SHOW LOGIN
+================================== */
+
+function showLogin(){
+
+document
+.getElementById("loginPanel")
+.style.display="block";
+
+document
+.getElementById("adminPanel")
+.style.display="none";
+
+}
+
+
+/* ==================================
+   ADD VIDEO
+================================== */
+
+async function addVideo(){
+
+const title=
+document.getElementById("title")
+.value.trim();
+
+const image=
+document.getElementById("image")
+.value.trim();
+
+const video=
+document.getElementById("video")
+.value.trim();
+
+const category=
+document.getElementById("category")
+.value;
+
+const duration=
+document.getElementById("duration")
+.value.trim() || "00:00";
+
+const views=
+document.getElementById("views")
+.value.trim() || "0";
+
+
+if(!title){
+
+showMessage(
+"submitMessage",
+"Please enter a video title."
+);
+
+return;
+
+}
+
+
+if(!image){
+
+showMessage(
+"submitMessage",
+"Please enter a thumbnail URL."
+);
+
+return;
+
+}
+
+
+if(!video){
+
+showMessage(
+"submitMessage",
+"Please enter the video URL."
+);
+
+return;
+
+}
+
+
+/*
+The database RLS policy is the real security.
+Even if someone bypasses this page,
+Supabase will reject the insert
+unless the logged-in user is an admin.
+*/
+
+const {
+error
+}=
+await supabaseClient
+.from("videos")
+.insert({
+
+title:title,
+image:image,
+video:video,
+category:category,
+duration:duration,
+views:views
+
+});
+
+
+if(error){
+
+console.error(error);
+
+showMessage(
+"submitMessage",
+"Unable to add video: "+error.message
+);
+
+return;
+
+}
+
+
+showMessage(
+"submitMessage",
+"Video added successfully!",
+true
+);
+
+
+document
+.getElementById("title")
+.value="";
+
+document
+.getElementById("image")
+.value="";
+
+document
+.getElementById("video")
+.value="";
+
+document
+.getElementById("duration")
+.value="";
+
+document
+.getElementById("views")
+.value="";
+
+document
+.getElementById("preview")
+.style.display="none";
+
+}
+
+
+/* ==================================
+   IMAGE PREVIEW
+================================== */
+
+function previewImage(){
+
+const url=
+document.getElementById("image")
+.value.trim();
+
+const preview=
+document.getElementById("preview");
+
+const img=
+document.getElementById("previewImg");
+
+
+if(!url){
+
+preview.style.display="none";
+
+return;
+
+}
+
+
+img.src=url;
+
+preview.style.display="block";
+
+}
+
+
+/* ==================================
+   LOGOUT
+================================== */
+
+async function logoutAdmin(){
+
+await supabaseClient.auth.signOut();
+
+showLogin();
+
+}
+
+
+/* ==================================
+   AUTH STATE
+================================== */
+
+supabaseClient.auth.onAuthStateChange(
+(event,session)=>{
+
+if(session && session.user){
+
+setTimeout(
+()=>checkAdmin(session.user),
+0
+);
+
+}else{
+
+showLogin();
+
+}
+
+});
+
+
+/* ==================================
+   INITIAL CHECK
+================================== */
+
+checkAdmin();
+
+</script>
+
+</body>
+</html>
