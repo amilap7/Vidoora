@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Vidoora - Sign Up</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#0b0b0d;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.box{
+    width:100%;
+    max-width:420px;
+    background:#151519;
+    border:1px solid #303035;
+    border-radius:20px;
+    padding:28px 22px;
+}
+
+.logo{
+    text-align:center;
+    font-size:29px;
+    font-weight:800;
+    margin-bottom:25px;
+}
+
+.logo span{
+    color:#ff1744;
+}
+
+h1{
+    font-size:25px;
+    margin-bottom:8px;
+}
+
+.subtitle{
+    color:#999;
+    font-size:14px;
+    margin-bottom:22px;
+    line-height:1.5;
+}
+
+label{
+    display:block;
+    font-size:13px;
+    font-weight:bold;
+    margin:15px 0 7px;
+}
+
+input{
+    width:100%;
+    height:46px;
+    padding:0 14px;
+    border-radius:10px;
+    border:1px solid #35353d;
+    background:#202027;
+    color:#fff;
+    outline:none;
+}
+
+input:focus{
+    border-color:#ff1744;
+}
+
+button{
+    width:100%;
+    height:46px;
+    margin-top:22px;
+    border:0;
+    border-radius:10px;
+    background:#ff1744;
+    color:#fff;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:.6;
+}
+
+.message{
+    display:none;
+    margin-top:15px;
+    padding:11px;
+    border-radius:9px;
+    font-size:13px;
+    text-align:center;
+    line-height:1.4;
+}
+
+.error{
+    background:#35151b;
+    color:#ff8a9d;
+}
+
+.success{
+    background:#183018;
+    color:#8cff8c;
+}
+
+.links{
+    text-align:center;
+    margin-top:20px;
+}
+
+.links a{
+    color:#ff1744;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.back{
+    display:block;
+    margin-top:15px;
+    color:#888 !important;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+    <div class="logo">
+        Vid<span>o</span>ora
+    </div>
+
+    <h1>Create Account</h1>
+
+    <p class="subtitle">
+        Creating an account is optional. You can also browse
+        and watch videos without signing up.
+    </p>
+
+    <label>Email</label>
+
+    <input
+        type="email"
+        id="email"
+        placeholder="Enter your email"
+        autocomplete="email"
+    >
+
+    <label>Password</label>
+
+    <input
+        type="password"
+        id="password"
+        placeholder="Create a password"
+        autocomplete="new-password"
+    >
+
+    <label>Confirm Password</label>
+
+    <input
+        type="password"
+        id="confirmPassword"
+        placeholder="Confirm your password"
+        autocomplete="new-password"
+    >
+
+    <button
+        id="signupBtn"
+        onclick="signupUser()"
+    >
+        Create Account
+    </button>
+
+    <div
+        class="message error"
+        id="errorMessage"
+    ></div>
+
+    <div
+        class="message success"
+        id="successMessage"
+    ></div>
+
+    <div class="links">
+
+        <a href="login.html">
+            Already have an account? Login
+        </a>
+
+        <a
+            href="index.html"
+            class="back"
+        >
+            ← Back to Vidoora
+        </a>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+    "https://lfsjnghkgzsghhcexgsu.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_xkvVadBo9ApuaE81iWdAsQ_Q8F5Efvv";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+function showError(message){
+
+    const box =
+        document.getElementById(
+            "errorMessage"
+        );
+
+    box.textContent = message;
+    box.style.display = "block";
+
+    document.getElementById(
+        "successMessage"
+    ).style.display = "none";
+
+}
+
+
+function showSuccess(message){
+
+    const box =
+        document.getElementById(
+            "successMessage"
+        );
+
+    box.textContent = message;
+    box.style.display = "block";
+
+    document.getElementById(
+        "errorMessage"
+    ).style.display = "none";
+
+}
+
+
+async function signupUser(){
+
+    const email =
+        document.getElementById(
+            "email"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "password"
+        ).value;
+
+    const confirmPassword =
+        document.getElementById(
+            "confirmPassword"
+        ).value;
+
+
+    if(!email || !password || !confirmPassword){
+
+        showError(
+            "Please complete all fields."
+        );
+
+        return;
+
+    }
+
+
+    if(password !== confirmPassword){
+
+        showError(
+            "Passwords do not match."
+        );
+
+        return;
+
+    }
+
+
+    if(password.length < 6){
+
+        showError(
+            "Password must be at least 6 characters."
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "signupBtn"
+        );
+
+    button.disabled = true;
+    button.textContent = "Creating account...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.signUp({
+
+            email:email,
+            password:password
+
+        });
+
+
+    if(error){
+
+        showError(
+            error.message
+        );
+
+        button.disabled = false;
+        button.textContent =
+            "Create Account";
+
+        return;
+
+    }
+
+
+    if(
+        data.user &&
+        data.session
+    ){
+
+        showSuccess(
+            "Account created successfully!"
+        );
+
+        setTimeout(function(){
+
+            window.location.href =
+                "index.html";
+
+        },1000);
+
+        return;
+
+    }
+
+
+    showSuccess(
+        "Account created. Please check your email to confirm your account."
+    );
+
+    button.disabled = false;
+    button.textContent =
+        "Create Account";
+
+}
+
+</script>
+
+</body>
+</html>
