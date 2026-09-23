@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Vidoora - Add Video</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#0b0b0d;
+  color:#fff;
+  min-height:100vh;
+}
+
+.header{
+  padding:18px;
+  background:#111116;
+  border-bottom:1px solid #292930;
+}
+
+.logo{
+  color:#ff1744;
+  font-size:28px;
+  font-weight:800;
+  text-align:center;
+}
+
+.container{
+  width:100%;
+  max-width:600px;
+  margin:auto;
+  padding:25px 16px 50px;
+}
+
+h1{
+  font-size:27px;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  color:#999;
+  margin-bottom:25px;
+}
+
+.form-box{
+  background:#15151b;
+  border:1px solid #292930;
+  border-radius:16px;
+  padding:20px;
+}
+
+label{
+  display:block;
+  margin:15px 0 7px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+input,select{
+  width:100%;
+  padding:13px;
+  border-radius:10px;
+  border:1px solid #35353d;
+  background:#202027;
+  color:#fff;
+  outline:none;
+}
+
+input:focus,select:focus{
+  border-color:#ff1744;
+}
+
+.add-btn{
+  width:100%;
+  margin-top:24px;
+  padding:14px;
+  border:0;
+  border-radius:10px;
+  background:#ff1744;
+  color:#fff;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.add-btn:disabled{
+  opacity:.6;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:18px;
+  color:#aaa;
+  text-decoration:none;
+}
+
+.logout{
+  display:block;
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border:1px solid #35353d;
+  border-radius:10px;
+  background:#202027;
+  color:#ddd;
+  cursor:pointer;
+}
+
+.message{
+  display:none;
+  margin-top:18px;
+  padding:12px;
+  border-radius:9px;
+  text-align:center;
+  font-size:13px;
+}
+
+.success{
+  background:#182818;
+  color:#8cff8c;
+}
+
+.error{
+  background:#35151b;
+  color:#ff8a9d;
+}
+
+.preview{
+  margin-top:20px;
+  display:none;
+}
+
+.preview img{
+  width:100%;
+  border-radius:12px;
+  max-height:300px;
+  object-fit:cover;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo">Vidoora</div>
+</header>
+
+<div class="container">
+
+<h1>Add New Video</h1>
+
+<p class="subtitle">
+Add a thumbnail, title and external video link.
+</p>
+
+<div class="form-box">
+
+<label>Video Title</label>
+
+<input
+  type="text"
+  id="title"
+  placeholder="Enter video title"
+>
+
+
+<label>Thumbnail Image URL</label>
+
+<input
+  type="url"
+  id="image"
+  placeholder="https://example.com/image.jpg"
+>
+
+
+<label>Video URL</label>
+
+<input
+  type="url"
+  id="video"
+  placeholder="https://example.com/video"
+>
+
+
+<label>Category</label>
+
+<select id="category">
+
+  <option value="Popular">
+    Popular
+  </option>
+
+  <option value="New">
+    New
+  </option>
+
+  <option value="Trending">
+    Trending
+  </option>
+
+</select>
+
+
+<label>Duration</label>
+
+<input
+  type="text"
+  id="duration"
+  placeholder="10:25"
+>
+
+
+<button
+  class="add-btn"
+  id="addBtn"
+  onclick="addVideo()"
+>
+  + Add Video
+</button>
+
+
+<div
+  class="message success"
+  id="successMessage"
+>
+  Video added successfully!
+</div>
+
+
+<div
+  class="message error"
+  id="errorMessage"
+></div>
+
+
+<div
+  class="preview"
+  id="preview"
+>
+
+  <img
+    id="previewImage"
+    src=""
+    alt="Preview"
+  >
+
+</div>
+
+</div>
+
+
+<a
+  href="index.html"
+  class="back"
+>
+← Back to Vidoora
+</a>
+
+
+<button
+  class="logout"
+  onclick="logoutAdmin()"
+>
+Sign Out
+</button>
+
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+    "https://lfsjnghkgzsghhcexgsu.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_xkvVadBo9ApuaE81iWdAsQ_Q8F5Efvv";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =========================
+   CHECK ADMIN
+========================= */
+
+async function checkAdmin(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if(
+        error ||
+        !data.session
+    ){
+
+        window.location.href =
+            "admin-login.html";
+
+        return false;
+
+    }
+
+
+    const user =
+        data.session.user;
+
+
+    const {
+        data:admin,
+        error:adminError
+    } =
+        await supabaseClient
+            .from("admin_users")
+            .select("user_id")
+            .eq(
+                "user_id",
+                user.id
+            )
+            .maybeSingle();
+
+
+    if(
+        adminError ||
+        !admin
+    ){
+
+        await supabaseClient.auth.signOut();
+
+        window.location.href =
+            "admin-login.html";
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================
+   ADD VIDEO
+========================= */
+
+async function addVideo(){
+
+    const isAdmin =
+        await checkAdmin();
+
+
+    if(!isAdmin){
+
+        return;
+
+    }
+
+
+    const title =
+        document.getElementById(
+            "title"
+        ).value.trim();
+
+    const image =
+        document.getElementById(
+            "image"
+        ).value.trim();
+
+    const video =
+        document.getElementById(
+            "video"
+        ).value.trim();
+
+    const category =
+        document.getElementById(
+            "category"
+        ).value;
+
+    const duration =
+        document.getElementById(
+            "duration"
+        ).value.trim();
+
+
+    if(
+        !title ||
+        !image ||
+        !video
+    ){
+
+        showError(
+            "Please enter title, image URL and video URL."
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "addBtn"
+        );
+
+    button.disabled = true;
+    button.textContent =
+        "Adding Video...";
+
+
+    const newVideo = {
+
+        title:title,
+
+        image:image,
+
+        video:video,
+
+        category:category,
+
+        duration:
+            duration ||
+            "00:00",
+
+        views:"0"
+
+    };
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("videos")
+            .insert([
+                newVideo
+            ]);
+
+
+    if(error){
+
+        showError(
+            error.message
+        );
+
+        button.disabled = false;
+        button.textContent =
+            "+ Add Video";
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "successMessage"
+    ).style.display =
+        "block";
+
+    document.getElementById(
+        "errorMessage"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "title"
+    ).value = "";
+
+    document.getElementById(
+        "image"
+    ).value = "";
+
+    document.getElementById(
+        "video"
+    ).value = "";
+
+    document.getElementById(
+        "duration"
+    ).value = "";
+
+    document.getElementById(
+        "preview"
+    ).style.display =
+        "none";
+
+
+    button.disabled = false;
+    button.textContent =
+        "+ Add Video";
+
+
+    setTimeout(function(){
+
+        document.getElementById(
+            "successMessage"
+        ).style.display =
+            "none";
+
+    },3000);
+
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+function showError(message){
+
+    const box =
+        document.getElementById(
+            "errorMessage"
+        );
+
+    box.textContent =
+        message;
+
+    box.style.display =
+        "block";
+
+    document.getElementById(
+        "successMessage"
+    ).style.display =
+        "none";
+
+}
+
+
+/* =========================
+   IMAGE PREVIEW
+========================= */
+
+document
+    .getElementById("image")
+    .addEventListener(
+        "input",
+        function(){
+
+            const url =
+                this.value.trim();
+
+            if(url){
+
+                document.getElementById(
+                    "preview"
+                ).style.display =
+                    "block";
+
+                document.getElementById(
+                    "previewImage"
+                ).src =
+                    url;
+
+            }else{
+
+                document.getElementById(
+                    "preview"
+                ).style.display =
+                    "none";
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logoutAdmin(){
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href =
+        "admin-login.html";
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+checkAdmin();
+
+</script>
+
+</body>
+</html>
