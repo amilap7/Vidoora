@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vidoora.linkshub.workers.dev/sitemap.xml
